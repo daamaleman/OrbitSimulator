@@ -27,6 +27,7 @@ class LabeledSlider(QWidget):
         self.value_spin.setSuffix(f" {suffix}" if suffix else "")
         self.value_spin.setValue(default)
         self.value_spin.setFixedWidth(140)
+        self.value_spin.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.value_spin.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         header.addWidget(self.title_label)

@@ -4,6 +4,7 @@ from PyQt6.QtGui import QPixmap, QIcon
 
 from ui.theme import Palette
 from ui.widgets.labeled_slider import LabeledSlider
+from ui.widgets.animated_button import AnimatedButton
 
 import os
 
@@ -108,15 +109,18 @@ class ControlPanel(QWidget):
         controls_layout = QGridLayout()
         controls_layout.setSpacing(12)
 
-        self.play_btn = QPushButton(" Play")
+        self.play_btn = AnimatedButton(" Play")
+        self.play_btn.set_colors(Palette.ACCENT_SUCCESS, Palette.ACCENT_SUCCESS_HOVER, "#000000")
         self.play_btn.setIcon(QIcon(os.path.join("assets", "icons", "play.svg")))
-        self.play_btn.setObjectName("PlayButton")
-        self.pause_btn = QPushButton(" Pause")
+        
+        self.pause_btn = AnimatedButton(" Pause")
+        self.pause_btn.set_colors(Palette.ACCENT_WARNING, Palette.ACCENT_WARNING_HOVER, "#000000")
         self.pause_btn.setIcon(QIcon(os.path.join("assets", "icons", "pause.svg")))
-        self.pause_btn.setObjectName("PauseButton")
-        self.reset_btn = QPushButton(" Reset")
+        
+        self.reset_btn = AnimatedButton(" Reset")
+        self.reset_btn.set_colors("transparent", Palette.BG_INPUT, Palette.ACCENT_SECONDARY)
+        self.reset_btn.base_style = f"border: 1px solid {Palette.ACCENT_SECONDARY}; border-radius: 6px; padding: 10px 16px; font-weight: 600; font-size: 13px; color: {Palette.ACCENT_SECONDARY};"
         self.reset_btn.setIcon(QIcon(os.path.join("assets", "icons", "reset.svg")))
-        self.reset_btn.setObjectName("ResetButton")
 
         controls_layout.addWidget(self.play_btn, 0, 0, 1, 2)
         controls_layout.addWidget(self.pause_btn, 1, 0)
