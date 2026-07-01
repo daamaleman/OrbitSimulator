@@ -180,6 +180,7 @@ class MainWindow(QMainWindow):
         
         self.engine._sync_to_internal()
         self.canvas.update_bodies([self.body1, self.body2])
+        self._update_distance_info()
 
     def _on_play(self) -> None:
         self.engine.start()
@@ -232,3 +233,14 @@ class MainWindow(QMainWindow):
         self.canvas.update_bodies(bodies)
         self.canvas.update_trails(bodies)
         self.control_panel.time_label.setText(f"t = {self.engine.elapsed_time:.2f} s")
+        self._update_distance_info()
+
+    def _update_distance_info(self) -> None:
+        pos1 = np.array(self.body1.position, dtype=float)
+        pos2 = np.array(self.body2.position, dtype=float)
+
+        distance = np.linalg.norm(pos2 - pos1)
+
+        self.control_panel.distance_info_label.setText(
+            f"Distancia: {distance:.2f} UA"
+        )

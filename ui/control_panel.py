@@ -152,9 +152,13 @@ class ControlPanel(QWidget):
         self.time_label = QLabel("t = 0.00 s")
         self.time_label.setProperty("role", "value")
         self.time_label.setStyleSheet("color: #4ADE80;")
+        self.distance_info_label = QLabel("Distancia: 15.00 UA")
+        self.distance_info_label.setProperty("role", "value")
+        self.distance_info_label.setStyleSheet("color: #93C5FD;")
         
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.time_label)
+        status_layout.addWidget(self.distance_info_label)
         status_group.setLayout(status_layout)
 
         root.addWidget(bodies_group)
