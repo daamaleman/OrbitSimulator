@@ -5,8 +5,15 @@ from models.celestial_body import CelestialBody
 
 class PhysicsEngine(QObject):
     """
-    Motor de cálculo físico basado en la Ley de Gravitación Universal de Newton.
-    Actualizado a integración Velocity Verlet y soporte 3D.
+    Motor de cálculo físico principal. Controla el avance del tiempo y la gravedad.
+    
+    Esta clase emite una señal `step_computed` cada vez que calcula un nuevo
+    fotograma (frame) matemático, el cual es luego dibujado por la UI (Arquitectura Model-View).
+    
+    Se utiliza el algoritmo de integración "Velocity Verlet" (en lugar del básico método de Euler)
+    porque Verlet es un integrador simpléctico: conserva maravillosamente bien la energía 
+    mecánica total del sistema orbital a largo plazo, evitando que los planetas se salgan
+    de órbita por errores de acumulación de punto flotante.
     """
 
     step_computed = pyqtSignal(list)
@@ -50,21 +57,32 @@ class PhysicsEngine(QObject):
         self.time_factor = factor
 
     def _compute_accelerations(self, positions: np.ndarray) -> np.ndarray:
+        """
+        Calcula la aceleración neta sobre cada cuerpo debida a la gravedad mutua de TODOS los demás.
+        Fórmula base (Newton): F = G * (m1 * m2) / r^2
+        Despejando Aceleración (a = F / m1): a = G * m2 / r^2
+        """
         n = len(self._masses)
         accelerations = np.zeros_like(positions)
         for i in range(n):
             for j in range(n):
                 if i != j:
+                    # delta es el vector distancia entre el cuerpo j (atractor) y i (atraído)
                     delta = positions[j] - positions[i]
+                    # linalg.norm calcula la magnitud del vector (distancia euclidiana r)
                     dist = np.linalg.norm(delta)
-                    # Validación de Singularidad: si colisionan (r ~ 0), la fuerza es 0 para evitar infinito
+                    
+                    # Validación de Singularidad: si colisionan (r ~ 0), evitamos dividir por cero
                     if dist < self.MIN_DISTANCE:
                         continue
                     
+                    # Magnitud de la aceleración: a = G * M / r^2
                     acc_mag = self.G_CONSTANT * self._masses[j] / (dist**2)
+                    
                     # Protect against division by zero or infinite forces
                     acc_mag = np.nan_to_num(acc_mag, posinf=0.0, neginf=0.0)
                     
+                    # Direccionamos la aceleración multiplicándola por el vector unitario (delta / dist)
                     vec = (delta / dist) * acc_mag
                     accelerations[i] += np.nan_to_num(vec, posinf=0.0, neginf=0.0)
         return accelerations

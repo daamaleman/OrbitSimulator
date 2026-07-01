@@ -14,9 +14,18 @@ from ui.theme import Palette
 import os
 
 class MainWindow(QMainWindow):
+    """
+    Ventana Principal de la Aplicación.
+    
+    Concepto Educativo: Patrón de Arquitectura MVC (Modelo-Vista-Controlador).
+    - Modelo: La clase PhysicsEngine y CelestialBody contienen la lógica pura.
+    - Vista: ControlPanel y SimulationCanvas solo muestran la información y dibujan.
+    - Controlador: Esta clase MainWindow actúa como orquestador, conectando los 
+      "Signals" de los botones y sliders de la UI con las funciones del motor físico.
+    """
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Orbit Simulator 3D")
+        self.setWindowTitle("Simulador de Órbitas - Edu Version")
         
         logo_path = os.path.join("assets", "logo.png")
         if os.path.exists(logo_path):

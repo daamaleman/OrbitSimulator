@@ -6,8 +6,25 @@ from ui.theme import Palette
 @dataclass
 class CelestialBody:
     """
-    Representa un cuerpo celeste dentro de la simulación.
-    Actualizado a 3D.
+    Clase de Datos (Data Class) que representa un cuerpo celeste en el espacio.
+    
+    Se utiliza @dataclass de Python para generar automáticamente métodos mágicos 
+    como __init__ y __repr__ basados en los atributos definidos.
+    
+    Atributos:
+    ----------
+    name : str
+        El nombre identificador del cuerpo (ej. "Tierra", "Sol").
+    mass : float
+        La masa del cuerpo celeste. Fundamental para el cálculo de la fuerza de gravedad.
+    position : List[float]
+        Vector 3D de la posición actual del cuerpo en el espacio [x, y, z].
+    velocity : List[float]
+        Vector 3D de la velocidad actual del cuerpo [vx, vy, vz].
+    color : str
+        Color en formato hexadecimal (ej. "#FFFFFF") usado para el renderizado 3D.
+    trail : List[Tuple[float, float, float]]
+        Historial de las últimas posiciones. Se utiliza para dibujar la órbita (estela) visualmente.
     """
     name: str
     mass: float

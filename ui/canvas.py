@@ -64,18 +64,28 @@ class SimulationCanvas(QWidget):
         return (col.redF(), col.greenF(), col.blueF(), alpha)
 
     def _generate_procedural_colors(self, hex_color: str, meshdata: gl.MeshData) -> np.ndarray:
-        """Genera colores por vértice simulando océanos, continentes y bandas."""
+        """
+        Genera colores por vértice simulando océanos, continentes y bandas atmosféricas.
+        
+        Concepto Educativo: Texturizado Procedural 3D sin Imágenes (Procedural Generation).
+        En lugar de cargar texturas de disco (JPG/PNG), usamos funciones trigonométricas 
+        (seno y coseno) aplicadas sobre las coordenadas polares de cada punto (latitud y longitud) 
+        para generar patrones que parecen nubes, tierra o cráteres.
+        """
         verts = meshdata.vertexes()
         colors = np.zeros((len(verts), 4))
         preset = self.color_preset_map.get(hex_color.upper(), "Generico")
         
         for i, v in enumerate(verts):
             x, y, z = v
+            # Cálculo de la longitud de radio r usando Teorema de Pitágoras en 3D
             r = np.sqrt(x*x + y*y + z*z)
+            # Latitud matemática (ángulo respecto al ecuador) y Longitud
             lat = np.arcsin(z / r) if r != 0 else 0
             lon = np.arctan2(y, x)
             
             if preset == "Tierra":
+                # La suma de senos crea el "ruido" orgánico de los continentes
                 noise = np.sin(5*lat) * np.cos(5*lon) + 0.5 * np.sin(10*lat)
                 if noise > 0.2:
                     colors[i] = [0.13, 0.54, 0.13, 1.0] # Continente verde
