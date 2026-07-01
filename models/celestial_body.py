@@ -15,3 +15,14 @@ class CelestialBody:
     velocity: List[float] = field(default_factory=lambda: [0.0, 0.0, 0.0])   # [vx, vy, vz]
     color: str = Palette.BODY_1_COLOR
     trail: List[Tuple[float, float, float]] = field(default_factory=list)    # [x, y, z]
+
+    def __post_init__(self):
+        # Type enforcement
+        self.mass = float(self.mass)
+        self.position = [float(v) for v in self.position]
+        self.velocity = [float(v) for v in self.velocity]
+        # Ensure exactly 3 dimensions
+        if len(self.position) != 3:
+            self.position = [0.0, 0.0, 0.0]
+        if len(self.velocity) != 3:
+            self.velocity = [0.0, 0.0, 0.0]

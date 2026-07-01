@@ -6,7 +6,14 @@ from ui.main_window import MainWindow
 
 def main():
     app = QApplication(sys.argv)
+    
+    # Prevenir warning de 'setPointSize <= 0 (-1)' forzando fuente base nativa
+    font = app.font()
+    font.setPointSize(10)
+    app.setFont(font)
+    
     app.setStyleSheet(build_stylesheet())
+    
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

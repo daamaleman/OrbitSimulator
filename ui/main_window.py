@@ -122,7 +122,14 @@ class MainWindow(QMainWindow):
         
         G = PhysicsEngine.G_CONSTANT
         total_mass = m1 + m2
-        v_rel = np.sqrt(G * total_mass / dist)
+        if total_mass <= 0:
+            total_mass = 1e-5
+            
+        safe_dist = max(1e-5, dist)
+        
+        # Protect sqrt from negative numbers just in case
+        val_inside_sqrt = max(0.0, G * total_mass / safe_dist)
+        v_rel = np.sqrt(val_inside_sqrt)
         
         vy1 = -(m2 / total_mass) * v_rel
         vy2 = (m1 / total_mass) * v_rel

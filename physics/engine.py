@@ -61,7 +61,11 @@ class PhysicsEngine(QObject):
                         dist = self.MIN_DISTANCE
                     
                     acc_mag = self.G_CONSTANT * self._masses[j] / (dist**2)
-                    accelerations[i] += acc_mag * (delta / dist)
+                    # Protect against division by zero or infinite forces
+                    acc_mag = np.nan_to_num(acc_mag, posinf=0.0, neginf=0.0)
+                    
+                    vec = (delta / dist) * acc_mag
+                    accelerations[i] += np.nan_to_num(vec, posinf=0.0, neginf=0.0)
         return accelerations
 
     def integrate_step(self) -> None:
