@@ -30,10 +30,12 @@ class SimulationCanvas(QWidget):
         
         # Grilla estelar
         grid = gl.GLGridItem()
-        grid.scale(2, 2, 2)
+        # Tamaño total de la grilla
+        grid.setSize(x=500, y=500)
+        # Espacio entre cada recuadro
+        grid.setSpacing(x=0.75, y=0.75)
         grid.setDepthValue(10)
         self.view.addItem(grid)
-
         # Diccionarios de elementos 3D
         self.planet_meshes: dict = {}
         self.trail_curves: dict = {}
