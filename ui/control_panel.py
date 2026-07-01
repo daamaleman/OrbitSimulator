@@ -1,5 +1,5 @@
 from PyQt6.QtCore import pyqtSignal, Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGroupBox, QGridLayout, QPushButton, QFrame, QSizePolicy, QComboBox, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGroupBox, QGridLayout, QPushButton, QFrame, QSizePolicy, QComboBox, QHBoxLayout, QScrollArea
 from PyQt6.QtGui import QPixmap, QIcon
 
 from ui.theme import Palette
@@ -33,9 +33,25 @@ class ControlPanel(QWidget):
         self.setMaximumWidth(450)
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
-        root = QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+
+        scroll_content = QWidget()
+        scroll_content.setObjectName("ControlPanelContent")
+
+        root = QVBoxLayout(scroll_content)
         root.setContentsMargins(24, 28, 24, 24)
         root.setSpacing(18)
+
+        scroll_area.setWidget(scroll_content)
+        main_layout.addWidget(scroll_area)
 
         # --- Cabecera con Logo ---
         header_layout = QHBoxLayout()
