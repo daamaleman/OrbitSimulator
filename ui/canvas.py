@@ -12,7 +12,7 @@ from models.celestial_body import CelestialBody
 class SimulationCanvas(QWidget):
     """
     Lienzo dominante que representa el espacio exterior en 3D.
-    Usa pyqtgraph.opengl.GLViewWidget.
+    Usa pyqtgraph.opengl.GLViewWidget con mallas reales 3D (esferas).
     """
 
     def __init__(self, parent=None):
@@ -29,19 +29,18 @@ class SimulationCanvas(QWidget):
         bg = QColor(Palette.BG_PRIMARY)
         self.view.setBackgroundColor(bg)
         
-        # Opcional: Agregar una grilla estelar/plana tenue
+        # Grilla estelar/plana tenue
         grid = gl.GLGridItem()
         grid.scale(2, 2, 2)
         grid.setDepthValue(10)  # dibujar atras
         self.view.addItem(grid)
 
-        # Scatters para cuerpos (no hay size/glow complejo en GLScatterPlotItem, es mas simple)
-        self.bodies_scatter = gl.GLScatterPlotItem()
-        self.bodies_scatter.setGLOptions('translucent')
-        self.view.addItem(self.bodies_scatter)
-
-        # Curvas de trayectoria (diccionario name -> GLLinePlotItem)
+        # Diccionarios de elementos 3D
+        self.planet_meshes: dict = {}
         self.trail_curves: dict = {}
+
+        # Generar mesh de esfera base, reutilizable
+        self.base_sphere_data = gl.MeshData.sphere(rows=20, cols=20)
 
         layout.addWidget(self.view)
         
@@ -54,14 +53,27 @@ class SimulationCanvas(QWidget):
         return (col.redF(), col.greenF(), col.blueF(), alpha)
 
     def update_bodies(self, bodies: List[CelestialBody]) -> None:
-        """Refresca posiciones de los cuerpos en el espacio 3D."""
-        pos = np.array([b.position for b in bodies])
-        colors = np.array([self._get_gl_color(b.color, 1.0) for b in bodies])
-        
-        # Escala visual del tamaño segun la masa (px en pantalla)
-        sizes = np.array([min(36.0, max(8.0, (b.mass / 100.0) * 16.0 + 8.0)) for b in bodies])
-        
-        self.bodies_scatter.setData(pos=pos, color=colors, size=sizes)
+        """Refresca posiciones de los cuerpos y escala sus esferas 3D."""
+        for b in bodies:
+            if b.name not in self.planet_meshes:
+                color = self._get_gl_color(b.color, 1.0)
+                mesh = gl.GLMeshItem(meshdata=self.base_sphere_data, smooth=True, color=color, shader='shaded')
+                self.view.addItem(mesh)
+                self.planet_meshes[b.name] = mesh
+            
+            mesh = self.planet_meshes[b.name]
+            
+            # Escala basada en la masa (para visualizacion)
+            size = min(4.0, max(0.5, (b.mass / 1000.0) * 3.0 + 0.5))
+            
+            # Actualizamos transformacion abs: resetear matriz, escalar, mover
+            mesh.resetTransform()
+            mesh.scale(size, size, size)
+            mesh.translate(b.position[0], b.position[1], b.position[2])
+            
+            # Si el color cambio desde la UI
+            new_color = self._get_gl_color(b.color, 1.0)
+            mesh.setColor(new_color)
 
     def update_trails(self, bodies: List[CelestialBody]) -> None:
         """Refresca las trayectorias 3D."""
@@ -75,11 +87,13 @@ class SimulationCanvas(QWidget):
             
             curve = self.trail_curves[b.name]
             
+            # Actualizamos el color si cambio en la UI
+            col = self._get_gl_color(b.color, Palette.TRAIL_ALPHA / 255.0)
+            
             if len(b.trail) > 1:
                 pts = np.array(b.trail)
-                curve.setData(pos=pts)
+                curve.setData(pos=pts, color=col)
             else:
-                # empty
                 curve.setData(pos=np.zeros((0, 3)))
 
     def clear_trails(self) -> None:
