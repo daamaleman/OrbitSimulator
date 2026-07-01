@@ -57,8 +57,9 @@ class PhysicsEngine(QObject):
                 if i != j:
                     delta = positions[j] - positions[i]
                     dist = np.linalg.norm(delta)
+                    # Validación de Singularidad: si colisionan (r ~ 0), la fuerza es 0 para evitar infinito
                     if dist < self.MIN_DISTANCE:
-                        dist = self.MIN_DISTANCE
+                        continue
                     
                     acc_mag = self.G_CONSTANT * self._masses[j] / (dist**2)
                     # Protect against division by zero or infinite forces
@@ -75,6 +76,10 @@ class PhysicsEngine(QObject):
         self._masses = np.array([b.mass for b in self.bodies], dtype=float)
 
         effective_dt = self.dt * self.time_factor
+        
+        # Validación de Diferencial de Tiempo: dt debe ser estrictamente positivo
+        if effective_dt <= 0:
+            return
         MAX_DT_PER_STEP = 0.01
         num_steps = max(1, int(np.ceil(effective_dt / MAX_DT_PER_STEP)))
         step_dt = effective_dt / num_steps

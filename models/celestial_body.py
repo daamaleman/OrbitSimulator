@@ -26,3 +26,6 @@ class CelestialBody:
             self.position = [0.0, 0.0, 0.0]
         if len(self.velocity) != 3:
             self.velocity = [0.0, 0.0, 0.0]
+            
+        if self.mass <= 0:
+            raise ValueError("Error de Validación (Física): La masa debe ser estrictamente mayor a cero (m > 0).")

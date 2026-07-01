@@ -2,7 +2,7 @@ from typing import List
 import numpy as np
 
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QSplitter
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QSplitter, QMessageBox
 from PyQt6.QtGui import QIcon
 
 from models.celestial_body import CelestialBody
@@ -43,9 +43,19 @@ class MainWindow(QMainWindow):
         layout.addWidget(splitter)
 
         # Planetas base (se actualizaran por los presets inmediatamente despues)
-        self.body1 = CelestialBody(name="Body 1", mass=1000.0, position=[-7.5, 0.0, 0.0], color="#FBBF24")
-        self.body2 = CelestialBody(name="Body 2", mass=1.0, position=[7.5, 0.0, 0.0], color="#5B8CFF")
-        self.engine = PhysicsEngine(bodies=[self.body1, self.body2])
+        # Try block to catch any mathematical errors or invalid types from our physics models
+        try:
+            self.body1 = CelestialBody(name="Body 1", mass=1000.0, position=[-7.5, 0.0, 0.0], color="#FBBF24")
+            self.body2 = CelestialBody(name="Body 2", mass=1.0, position=[7.5, 0.0, 0.0], color="#5B8CFF")
+            self.engine = PhysicsEngine(bodies=[self.body1, self.body2])
+        except ValueError as e:
+            self.engine.pause()
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setWindowTitle("Error de Validación (Simulación)")
+            msg.setText(str(e))
+            msg.setStyleSheet("QMessageBox { background-color: #15151B; color: #E0E0E0; } QLabel { color: #E0E0E0; } QPushButton { background-color: #2A2A35; color: white; border-radius: 4px; padding: 5px; }")
+            msg.exec()
 
         self.sim_timer = QTimer(self)
         self.sim_timer.setInterval(16)
