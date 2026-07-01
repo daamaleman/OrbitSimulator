@@ -5,15 +5,29 @@ from models.celestial_body import CelestialBody
 
 class PhysicsEngine(QObject):
     """
+    [DOCUMENTACIÓN DE FÍSICA Y MATEMÁTICAS]
+    =======================================
     Motor de cálculo físico principal. Controla el avance del tiempo y la gravedad.
     
+    1. Integración Cinemática (Velocity Verlet):
+       - ¿Dónde se usa?: En el método `integrate_step()` de esta misma clase.
+       - ¿Cómo se usa?: Se utiliza para actualizar la posición `r(t+dt)` y la 
+         velocidad `v(t+dt)` en pasos discretos de tiempo (`dt`). A diferencia del
+         método de Euler, Velocity Verlet es un "integrador simpléctico", lo que significa
+         que conserva la energía mecánica total del sistema orbital a largo plazo. 
+         Evita que los planetas salgan disparados al infinito por acumulación de errores de 
+         punto flotante.
+         
+    2. Singularidades y Validación (Anti-Infinito):
+       - ¿Dónde se usa?: En el método `_compute_accelerations()` de esta misma clase.
+       - ¿Cómo se usa?: La Ley de Gravitación dice que F es inversamente proporcional
+         a la distancia al cuadrado (r^2). Si r=0 (colisión exacta), la fuerza tiende 
+         al infinito matemático. En el código, detectamos si `dist < MIN_DISTANCE` y 
+         usamos la palabra clave `continue` para detener la atracción, emulando un choque 
+         y salvando al procesador de una división por cero.
+         
     Esta clase emite una señal `step_computed` cada vez que calcula un nuevo
-    fotograma (frame) matemático, el cual es luego dibujado por la UI (Arquitectura Model-View).
-    
-    Se utiliza el algoritmo de integración "Velocity Verlet" (en lugar del básico método de Euler)
-    porque Verlet es un integrador simpléctico: conserva maravillosamente bien la energía 
-    mecánica total del sistema orbital a largo plazo, evitando que los planetas se salgan
-    de órbita por errores de acumulación de punto flotante.
+    fotograma matemático para ser dibujado en la UI (Arquitectura Model-View).
     """
 
     step_computed = pyqtSignal(list)
@@ -58,9 +72,18 @@ class PhysicsEngine(QObject):
 
     def _compute_accelerations(self, positions: np.ndarray) -> np.ndarray:
         """
+        [DOCUMENTACIÓN DE FÍSICA Y MATEMÁTICAS]
+        =======================================
         Calcula la aceleración neta sobre cada cuerpo debida a la gravedad mutua de TODOS los demás.
-        Fórmula base (Newton): F = G * (m1 * m2) / r^2
-        Despejando Aceleración (a = F / m1): a = G * m2 / r^2
+        
+        - Ley Gravitacional (Newton): F = G * (m1 * m2) / r^2
+        - Despejando Aceleración (a = F / m1): a = G * m2 / r^2
+        
+        ¿Dónde y cómo se aplica en el código?
+        - `delta = positions[j] - positions[i]` obtiene el vector distancia en el espacio 3D.
+        - `dist = np.linalg.norm(delta)` es nuestra r (magnitud euclidiana pitagórica).
+        - `acc_mag = self.G_CONSTANT * self._masses[j] / (dist**2)` es literalmente la ecuación 
+          'a = G * M / r^2' trasladada a código puro, procesada de forma vectorizada gracias a Numpy.
         """
         n = len(self._masses)
         accelerations = np.zeros_like(positions)

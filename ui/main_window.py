@@ -131,6 +131,22 @@ class MainWindow(QMainWindow):
         self.engine.step_computed.connect(self._on_step_computed)
 
     def _setup_initial_conditions(self) -> None:
+        """
+        [DOCUMENTACIÓN DE FÍSICA Y MATEMÁTICAS]
+        =======================================
+        Calcula las velocidades iniciales necesarias para lograr una órbita circular estable.
+        
+        - Ecuación Orbital Circular: v = sqrt(G * MasaTotal / distancia)
+        
+        ¿Dónde y cómo se aplica en el código?
+        - `G` extraemos la constante definida en el motor (0.005).
+        - `total_mass = m1 + m2` usamos la masa de ambos cuerpos.
+        - En la línea `v_rel = np.sqrt(val_inside_sqrt)` se aplica literalmente la ecuación orbital
+          tras asegurar que el valor dentro de la raíz no es negativo (defensa matemática).
+        - Las líneas `vy1` y `vy2` toman esta velocidad teórica y la distribuyen vectorialmente
+          sobre el eje Y en proporción inversa a su masa (para que el cuerpo más ligero viaje más rápido), 
+          logrando así que el centro de gravedad compartido quede estático.
+        """
         dist = self.control_panel.distance_slider.value()
         m1 = self.body1.mass
         m2 = self.body2.mass
