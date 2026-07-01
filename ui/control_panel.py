@@ -1,6 +1,6 @@
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QGroupBox, QGridLayout, QPushButton, QFrame, QSizePolicy, QComboBox, QHBoxLayout
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QIcon
 
 from ui.theme import Palette
 from ui.widgets.labeled_slider import LabeledSlider
@@ -74,7 +74,7 @@ class ControlPanel(QWidget):
         self.preset1_combo.setCurrentText("Sol")
         preset1_layout.addWidget(self.preset1_combo)
         
-        self.mass1_slider = LabeledSlider("Masa — 1", 0.01, 1000.0, 1000.0, step=1.0, suffix="M⊕")
+        self.mass1_slider = LabeledSlider("Masa — 1", 0.01, 500000.0, 333000.0, step=10.0, suffix="M⊕")
         
         # Preset 2
         preset2_layout = QHBoxLayout()
@@ -84,7 +84,7 @@ class ControlPanel(QWidget):
         self.preset2_combo.setCurrentText("Tierra")
         preset2_layout.addWidget(self.preset2_combo)
         
-        self.mass2_slider = LabeledSlider("Masa — 2", 0.01, 1000.0, 1.0, step=0.1, suffix="M⊕")
+        self.mass2_slider = LabeledSlider("Masa — 2", 0.01, 500000.0, 1.0, step=0.1, suffix="M⊕")
         self.distance_slider = LabeledSlider("Distancia", 1.0, 100.0, 15.0, step=0.1, suffix="UA")
 
         bodies_layout.addLayout(preset1_layout)
@@ -108,11 +108,14 @@ class ControlPanel(QWidget):
         controls_layout = QGridLayout()
         controls_layout.setSpacing(12)
 
-        self.play_btn = QPushButton("▶  Play")
+        self.play_btn = QPushButton(" Play")
+        self.play_btn.setIcon(QIcon(os.path.join("assets", "icons", "play.svg")))
         self.play_btn.setObjectName("PlayButton")
-        self.pause_btn = QPushButton("⏸  Pause")
+        self.pause_btn = QPushButton(" Pause")
+        self.pause_btn.setIcon(QIcon(os.path.join("assets", "icons", "pause.svg")))
         self.pause_btn.setObjectName("PauseButton")
-        self.reset_btn = QPushButton("⟲  Reset")
+        self.reset_btn = QPushButton(" Reset")
+        self.reset_btn.setIcon(QIcon(os.path.join("assets", "icons", "reset.svg")))
         self.reset_btn.setObjectName("ResetButton")
 
         controls_layout.addWidget(self.play_btn, 0, 0, 1, 2)

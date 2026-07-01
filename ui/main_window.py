@@ -64,7 +64,7 @@ class MainWindow(QMainWindow):
     def _apply_preset(self, body_index: int, preset_name: str) -> None:
         """Aplica un preset planetario a un cuerpo."""
         presets = {
-            "Sol": {"mass": 1000.0, "color": "#FBBF24"},
+            "Sol": {"mass": 333000.0, "color": "#FBBF24"},
             "Júpiter": {"mass": 317.0, "color": "#F97316"},
             "Tierra": {"mass": 1.0, "color": "#3B82F6"},
             "Marte": {"mass": 0.1, "color": "#EF4444"},

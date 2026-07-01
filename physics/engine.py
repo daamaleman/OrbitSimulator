@@ -11,7 +11,7 @@ class PhysicsEngine(QObject):
 
     step_computed = pyqtSignal(list)
 
-    G_CONSTANT = 5.0
+    G_CONSTANT = 0.005
     MIN_DISTANCE = 0.5
 
     def __init__(self, bodies: Optional[List[CelestialBody]] = None):
