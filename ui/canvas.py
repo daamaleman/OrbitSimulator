@@ -133,6 +133,7 @@ class SimulationCanvas(QWidget):
                 mdata.setVertexColors(v_colors)
                 
                 mesh = gl.GLMeshItem(meshdata=mdata, smooth=True, shader='shaded')
+                mesh._mdata = mdata
                 self.view.addItem(mesh)
                 self.planet_meshes[b.name] = mesh
                 # Guardamos el color procesado
@@ -142,8 +143,8 @@ class SimulationCanvas(QWidget):
             
             # Si el preset/color cambio desde la UI, recalcular texturas procedurales
             if getattr(mesh, '_current_hex', None) != b.color:
-                v_colors = self._generate_procedural_colors(b.color, mesh.meshData)
-                mesh.meshData.setVertexColors(v_colors)
+                v_colors = self._generate_procedural_colors(b.color, mesh._mdata)
+                mesh._mdata.setVertexColors(v_colors)
                 mesh.meshDataChanged()
                 mesh._current_hex = b.color
             
